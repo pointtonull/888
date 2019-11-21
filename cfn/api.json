@@ -1,0 +1,529 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Transform": "AWS::Serverless-2016-10-31",
+  "Outputs": {
+    "RestAPIId": {
+      "Value": {
+        "Ref": "RestAPI"
+      }
+    },
+    "APIHandlerName": {
+      "Value": {
+        "Ref": "APIHandler"
+      }
+    },
+    "APIHandlerArn": {
+      "Value": {
+        "Fn::GetAtt": [
+          "APIHandler",
+          "Arn"
+        ]
+      }
+    },
+    "EndpointURL": {
+      "Value": {
+        "Fn::Sub": "https://${RestAPI}.execute-api.${AWS::Region}.amazonaws.com/api/"
+      }
+    }
+  },
+  "Resources": {
+    "DefaultRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:CreateLogGroup",
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents"
+                  ],
+                  "Resource": "arn:aws:logs:*:*:*"
+                }
+              ]
+            },
+            "PolicyName": "DefaultRolePolicy"
+          }
+        ]
+      }
+    },
+    "RestAPI": {
+      "Type": "AWS::Serverless::Api",
+      "Properties": {
+        "EndpointConfiguration": "EDGE",
+        "StageName": "api",
+        "DefinitionBody": {
+          "swagger": "2.0",
+          "info": {
+            "version": "1.0",
+            "title": "888"
+          },
+          "schemes": [
+            "https"
+          ],
+          "paths": {
+            "/env": {
+              "get": {
+                "consumes": [
+                  "application/json"
+                ],
+                "produces": [
+                  "application/json"
+                ],
+                "responses": {
+                  "200": {
+                    "description": "200 response",
+                    "schema": {
+                      "$ref": "#/definitions/Empty"
+                    }
+                  }
+                },
+                "x-amazon-apigateway-integration": {
+                  "responses": {
+                    "default": {
+                      "statusCode": "200"
+                    }
+                  },
+                  "uri": {
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${APIHandler.Arn}/invocations"
+                  },
+                  "passthroughBehavior": "when_no_match",
+                  "httpMethod": "POST",
+                  "contentHandling": "CONVERT_TO_TEXT",
+                  "type": "aws_proxy"
+                },
+                "summary": "Debuging endpoint.",
+                "description": "Describe Lambda execution environment."
+              }
+            },
+            "/app": {
+              "get": {
+                "consumes": [
+                  "application/json"
+                ],
+                "produces": [
+                  "application/json"
+                ],
+                "responses": {
+                  "200": {
+                    "description": "200 response",
+                    "schema": {
+                      "$ref": "#/definitions/Empty"
+                    }
+                  }
+                },
+                "x-amazon-apigateway-integration": {
+                  "responses": {
+                    "default": {
+                      "statusCode": "200"
+                    }
+                  },
+                  "uri": {
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${APIHandler.Arn}/invocations"
+                  },
+                  "passthroughBehavior": "when_no_match",
+                  "httpMethod": "POST",
+                  "contentHandling": "CONVERT_TO_TEXT",
+                  "type": "aws_proxy"
+                },
+                "summary": "Debuging endpoint.",
+                "description": "Describe current app attributes."
+              }
+            },
+            "/app/{attr}": {
+              "get": {
+                "consumes": [
+                  "application/json"
+                ],
+                "produces": [
+                  "application/json"
+                ],
+                "responses": {
+                  "200": {
+                    "description": "200 response",
+                    "schema": {
+                      "$ref": "#/definitions/Empty"
+                    }
+                  }
+                },
+                "x-amazon-apigateway-integration": {
+                  "responses": {
+                    "default": {
+                      "statusCode": "200"
+                    }
+                  },
+                  "uri": {
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${APIHandler.Arn}/invocations"
+                  },
+                  "passthroughBehavior": "when_no_match",
+                  "httpMethod": "POST",
+                  "contentHandling": "CONVERT_TO_TEXT",
+                  "type": "aws_proxy"
+                },
+                "summary": "Debuging endpoint.",
+                "description": "Describe current app's {attribute}.",
+                "parameters": [
+                  {
+                    "name": "attr",
+                    "in": "path",
+                    "required": true,
+                    "type": "string"
+                  }
+                ]
+              }
+            },
+            "/request": {
+              "get": {
+                "consumes": [
+                  "application/json"
+                ],
+                "produces": [
+                  "application/json"
+                ],
+                "responses": {
+                  "200": {
+                    "description": "200 response",
+                    "schema": {
+                      "$ref": "#/definitions/Empty"
+                    }
+                  }
+                },
+                "x-amazon-apigateway-integration": {
+                  "responses": {
+                    "default": {
+                      "statusCode": "200"
+                    }
+                  },
+                  "uri": {
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${APIHandler.Arn}/invocations"
+                  },
+                  "passthroughBehavior": "when_no_match",
+                  "httpMethod": "POST",
+                  "contentHandling": "CONVERT_TO_TEXT",
+                  "type": "aws_proxy"
+                },
+                "summary": "Describe current request context."
+              },
+              "post": {
+                "consumes": [
+                  "application/json"
+                ],
+                "produces": [
+                  "application/json"
+                ],
+                "responses": {
+                  "200": {
+                    "description": "200 response",
+                    "schema": {
+                      "$ref": "#/definitions/Empty"
+                    }
+                  }
+                },
+                "x-amazon-apigateway-integration": {
+                  "responses": {
+                    "default": {
+                      "statusCode": "200"
+                    }
+                  },
+                  "uri": {
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${APIHandler.Arn}/invocations"
+                  },
+                  "passthroughBehavior": "when_no_match",
+                  "httpMethod": "POST",
+                  "contentHandling": "CONVERT_TO_TEXT",
+                  "type": "aws_proxy"
+                },
+                "summary": "Describe current request context."
+              },
+              "put": {
+                "consumes": [
+                  "application/json"
+                ],
+                "produces": [
+                  "application/json"
+                ],
+                "responses": {
+                  "200": {
+                    "description": "200 response",
+                    "schema": {
+                      "$ref": "#/definitions/Empty"
+                    }
+                  }
+                },
+                "x-amazon-apigateway-integration": {
+                  "responses": {
+                    "default": {
+                      "statusCode": "200"
+                    }
+                  },
+                  "uri": {
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${APIHandler.Arn}/invocations"
+                  },
+                  "passthroughBehavior": "when_no_match",
+                  "httpMethod": "POST",
+                  "contentHandling": "CONVERT_TO_TEXT",
+                  "type": "aws_proxy"
+                },
+                "summary": "Describe current request context."
+              }
+            },
+            "/": {
+              "get": {
+                "consumes": [
+                  "application/json"
+                ],
+                "produces": [
+                  "application/json"
+                ],
+                "responses": {
+                  "200": {
+                    "description": "200 response",
+                    "schema": {
+                      "$ref": "#/definitions/Empty"
+                    }
+                  }
+                },
+                "x-amazon-apigateway-integration": {
+                  "responses": {
+                    "default": {
+                      "statusCode": "200"
+                    }
+                  },
+                  "uri": {
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${APIHandler.Arn}/invocations"
+                  },
+                  "passthroughBehavior": "when_no_match",
+                  "httpMethod": "POST",
+                  "contentHandling": "CONVERT_TO_TEXT",
+                  "type": "aws_proxy"
+                },
+                "summary": "Describes available endpoints."
+              }
+            },
+            "/match/{match_id}": {
+              "get": {
+                "consumes": [
+                  "application/json"
+                ],
+                "produces": [
+                  "application/json"
+                ],
+                "responses": {
+                  "200": {
+                    "description": "200 response",
+                    "schema": {
+                      "$ref": "#/definitions/Empty"
+                    }
+                  }
+                },
+                "x-amazon-apigateway-integration": {
+                  "responses": {
+                    "default": {
+                      "statusCode": "200"
+                    }
+                  },
+                  "uri": {
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${APIHandler.Arn}/invocations"
+                  },
+                  "passthroughBehavior": "when_no_match",
+                  "httpMethod": "POST",
+                  "contentHandling": "CONVERT_TO_TEXT",
+                  "type": "aws_proxy"
+                },
+                "summary": "Fetches details for match {id}.",
+                "description": "response = {\n    \"id\": match_id,\n    \"url\": \"http://domain/api/match/994839351740\",\n    \"name\": \"Real Madrid vs Barcelona\",\n    \"startTime\": \"2018-06-20 10:30:00\",\n    \"sport\": {\"id\": 221, \"name\": \"Football\"},\n    \"markets\": [\n        {\n            \"id\": 385086549360973400,\n            \"name\": \"Winner\",\n            \"selections\": [\n                {\"id\": 8243901714083343000, \"name\": \"Real Madrid\", \"odds\": 1.01},\n                {\"id\": 5737666888266680000, \"name\": \"Barcelona\", \"odds\": 1.01},\n            ],\n        }\n    ],\n}",
+                "parameters": [
+                  {
+                    "name": "match_id",
+                    "in": "path",
+                    "required": true,
+                    "type": "string"
+                  }
+                ]
+              }
+            },
+            "/matches": {
+              "get": {
+                "consumes": [
+                  "application/json"
+                ],
+                "produces": [
+                  "application/json"
+                ],
+                "responses": {
+                  "200": {
+                    "description": "200 response",
+                    "schema": {
+                      "$ref": "#/definitions/Empty"
+                    }
+                  }
+                },
+                "x-amazon-apigateway-integration": {
+                  "responses": {
+                    "default": {
+                      "statusCode": "200"
+                    }
+                  },
+                  "uri": {
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${APIHandler.Arn}/invocations"
+                  },
+                  "passthroughBehavior": "when_no_match",
+                  "httpMethod": "POST",
+                  "contentHandling": "CONVERT_TO_TEXT",
+                  "type": "aws_proxy"
+                },
+                "summary": "Searchs matches in {sport}.",
+                "description": "Options:\n    ordening=[startTime]\n\ne.g.:\n    `GET https://domain/api/matches?sport=football`\n    `GET https://domain/api/matches?sport=chess`\n\n[\n  {\n    \"id\": {id},\n    \"url\": \"http://example.com/api/match/{id}\",\n    \"name\": \"Real Madrid vs Barcelona\",\n    \"startTime\": \"2018-06-20 10:30:00\"\n  },\n  {\n    \"id\": {id},\n    \"url\": \"http://example.com/api/match/{id}\",\n    \"name\": \"Cavaliers vs Lakers\",\n    \"startTime\": \"2018-01-15 22:00:00\"\n  }\n]\n\n`GET https://domain/api/matches?name=Real%20Madrid%20vs%20Barcelona`\n\n[\n  {\n    \"id\": {id},\n    \"url\": \"http://example.com/api/match/994839351740\",\n    \"name\": \"Real Madrid vs Barcelona\",\n    \"startTime\": \"2018-06-20 10:30:00\"\n  }\n]"
+              }
+            },
+            "/message": {
+              "put": {
+                "consumes": [
+                  "application/json"
+                ],
+                "produces": [
+                  "application/json"
+                ],
+                "responses": {
+                  "200": {
+                    "description": "200 response",
+                    "schema": {
+                      "$ref": "#/definitions/Empty"
+                    }
+                  }
+                },
+                "x-amazon-apigateway-integration": {
+                  "responses": {
+                    "default": {
+                      "statusCode": "200"
+                    }
+                  },
+                  "uri": {
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${APIHandler.Arn}/invocations"
+                  },
+                  "passthroughBehavior": "when_no_match",
+                  "httpMethod": "POST",
+                  "contentHandling": "CONVERT_TO_TEXT",
+                  "type": "aws_proxy"
+                },
+                "summary": "`PUT https://domain/api/message`"
+              },
+              "post": {
+                "consumes": [
+                  "application/json"
+                ],
+                "produces": [
+                  "application/json"
+                ],
+                "responses": {
+                  "200": {
+                    "description": "200 response",
+                    "schema": {
+                      "$ref": "#/definitions/Empty"
+                    }
+                  }
+                },
+                "x-amazon-apigateway-integration": {
+                  "responses": {
+                    "default": {
+                      "statusCode": "200"
+                    }
+                  },
+                  "uri": {
+                    "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${APIHandler.Arn}/invocations"
+                  },
+                  "passthroughBehavior": "when_no_match",
+                  "httpMethod": "POST",
+                  "contentHandling": "CONVERT_TO_TEXT",
+                  "type": "aws_proxy"
+                },
+                "summary": "`POST https://domain/api/message`",
+                "description": "{\n  \"id\": {id},\n  \"message_type\": \"NewEvent\",\n  \"event\": {\n    \"id\": {id},\n    \"name\": {name},\n    \"startTime\": {date},\n    \"sport\": {\n      \"id\": {id},\n      \"name\": {sport}\n    },\n    \"markets\": [\n      {\n        \"id\": {id},\n        \"name\": \"Winner\",\n        \"selections\": [\n          {\n            \"id\": {id},\n            \"name\": \"Real Madrid\",\n            \"odds\": 1.01\n          },\n          {\n            \"id\": {id},\n            \"name\": \"Barcelona\",\n            \"odds\": 1.01\n          }\n        ]\n      }\n    ]\n  }\n}"
+              }
+            }
+          },
+          "definitions": {
+            "Empty": {
+              "type": "object",
+              "title": "Empty Schema"
+            }
+          },
+          "x-amazon-apigateway-binary-media-types": [
+            "application/octet-stream",
+            "application/x-tar",
+            "application/zip",
+            "audio/basic",
+            "audio/ogg",
+            "audio/mp4",
+            "audio/mpeg",
+            "audio/wav",
+            "audio/webm",
+            "image/png",
+            "image/jpg",
+            "image/jpeg",
+            "image/gif",
+            "video/ogg",
+            "video/mpeg",
+            "video/webm"
+          ]
+        }
+      }
+    },
+    "APIHandler": {
+      "Type": "AWS::Serverless::Function",
+      "Properties": {
+        "Runtime": "python3.6",
+        "Handler": "app.app",
+        "CodeUri": "./deployment.zip",
+        "Tags": {
+          "aws-chalice": "version=1.12.0:stage=dev:app=api888"
+        },
+        "Timeout": 60,
+        "MemorySize": 128,
+        "Role": {
+          "Fn::GetAtt": [
+            "DefaultRole",
+            "Arn"
+          ]
+        }
+      }
+    },
+    "APIHandlerInvokePermission": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "APIHandler"
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": [
+            "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${RestAPIId}/*",
+            {
+              "RestAPIId": {
+                "Ref": "RestAPI"
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

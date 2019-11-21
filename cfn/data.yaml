@@ -1,0 +1,121 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Description: >-
+  AWS CloudFormation template to create data persitence for betting PoC
+
+Parameters:
+
+  Environment:
+    Description: "Type of environment: dev, staging, or prod"
+    Type:        String
+    Default:     dev
+    AllowedValues:
+    - dev
+    - staging
+    - prod
+
+
+Resources:
+
+  BetsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName:      "id"
+          AttributeType:      "N"
+        - AttributeName:      "startTime"
+          AttributeType:      "N"
+        - AttributeName:      "_sport"
+          AttributeType:      "S"
+      KeySchema:
+        - AttributeName:      "id"
+          KeyType:            "HASH"
+        - AttributeName:      "startTime"
+          KeyType:            "RANGE"
+      ProvisionedThroughput:
+        ReadCapacityUnits:    5
+        WriteCapacityUnits:   5
+
+      GlobalSecondaryIndexes:
+        -
+          IndexName: "sport_startTime"
+          KeySchema:
+            - AttributeName:      "_sport"
+              KeyType:            "HASH"
+            - AttributeName:      "startTime"
+              KeyType:            "RANGE"
+          Projection:
+            NonKeyAttributes:
+              - "name"
+            ProjectionType: "INCLUDE"
+          ProvisionedThroughput:
+            ReadCapacityUnits:    1
+            WriteCapacityUnits:   1
+
+
+  WriteCapacityScalableTarget:
+
+    Type: AWS::ApplicationAutoScaling::ScalableTarget
+    Properties:
+      MaxCapacity: 15
+      MinCapacity: 5
+      ResourceId: !Join
+        - /
+        - - table
+          - !Ref BetsTable
+      RoleARN: !GetAtt ScalingRole.Arn
+      ScalableDimension: dynamodb:table:WriteCapacityUnits
+      ServiceNamespace: dynamodb
+
+  ScalingRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Principal:
+              Service:
+                - application-autoscaling.amazonaws.com
+            Action:
+              - "sts:AssumeRole"
+      Path: "/"
+      Policies:
+        -
+          PolicyName: "root"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              -
+                Effect: "Allow"
+                Action:
+                  - "cloudwatch:DeleteAlarms"
+                  - "cloudwatch:DescribeAlarms"
+                  - "cloudwatch:GetMetricStatistics"
+                  - "cloudwatch:PutMetricAlarm"
+                  - "cloudwatch:SetAlarmState"
+                  - "dynamodb:DescribeTable"
+                  - "dynamodb:UpdateTable"
+                Resource: "*"
+
+  WriteScalingPolicy:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Properties:
+      PolicyName: WriteAutoScalingPolicy
+      PolicyType: TargetTrackingScaling
+      ScalingTargetId: !Ref WriteCapacityScalableTarget
+      TargetTrackingScalingPolicyConfiguration:
+        TargetValue: 75.0
+        ScaleInCooldown: 60
+        ScaleOutCooldown: 60
+        PredefinedMetricSpecification:
+          PredefinedMetricType: DynamoDBWriteCapacityUtilization
+
+Outputs:
+  BetsTable:
+      Description: "Betting Table"
+      Value: !GetAtt BetsTable.Arn
+      Export:
+        Name: !Sub "betting-table-${Environment}"

@@ -1,0 +1,9 @@
+# Dev enviroment dependencies
+black
+chalice
+ipython
+moto
+pdbpp
+pytest
+pytest-chalice
+pytest-coverage
