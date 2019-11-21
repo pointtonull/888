@@ -1,5 +1,13 @@
 # Quick Restful API
 
+## About this Implementation
+
+This is a coding kata. I an following a somewhat iflexible specification.
+With this limits of freedom I chose to persist on DynamoDB and to implement using serverless approach (API Gateway and Lambda Functions).
+
+It is deployed in https://z68mz9mv95.execute-api.eu-west-1.amazonaws.com/api/
+It's root returns a valid Swagger object. So, to explore/test a swagger explorer can be pointed to it.
+
 ## The main functional areas are:
 
 - Manage data about sporting events to allow users to place bets.

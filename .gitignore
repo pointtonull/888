@@ -1,7 +1,15 @@
+# project artifacts
+.cf.messages
+.deps
+*.swp
+_temp/
+src/.chalice/deployments/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
+
 
 # C extensions
 *.so
